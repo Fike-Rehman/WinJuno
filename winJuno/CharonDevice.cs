@@ -1,16 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 
 namespace CTS.winJuno
 {
-    public class CharonDevice
+    public class CharonDevice : IJunoDevice
     {
+        private static readonly log4net.ILog _logger =
+                 log4net.LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private ICharonSettings _settings;
 
         #region singleton
@@ -34,13 +35,17 @@ namespace CTS.winJuno
         #endregion
 
         // start the process that talks to the Charon board
-        public void Run(CancellationToken ct)
+        public void Run(CancellationToken cToken)
         {
-            while (!ct.IsCancellationRequested)
+            while (!cToken.IsCancellationRequested)
             {
-                // send a Ping request:
+               // send a Ping request:
 
                 Task<string> pingTask = PingAsync();
+
+                _logger.Debug($"{pingTask.Result}");
+
+                cToken.WaitHandle.WaitOne(TimeSpan.FromSeconds(60 * 1000));
             }
         }
 
