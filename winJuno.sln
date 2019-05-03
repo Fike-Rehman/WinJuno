@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "winJuno", "winJuno\winJuno.csproj", "{2C305E60-A4E5-4F36-A05C-9370172079C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTS.Common.Utilities", "CTS.Common.Utilities\CTS.Common.Utilities.csproj", "{91203F92-C413-427D-8E71-2CC0173DE36C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2C305E60-A4E5-4F36-A05C-9370172079C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C305E60-A4E5-4F36-A05C-9370172079C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C305E60-A4E5-4F36-A05C-9370172079C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91203F92-C413-427D-8E71-2CC0173DE36C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91203F92-C413-427D-8E71-2CC0173DE36C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91203F92-C413-427D-8E71-2CC0173DE36C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91203F92-C413-427D-8E71-2CC0173DE36C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

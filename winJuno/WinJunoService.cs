@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 
+
 namespace CTS.winJuno
 {
     public class WinJunoService : IDisposable
@@ -42,9 +43,12 @@ namespace CTS.winJuno
 
             speechSynthesizer.Speak("Starting Windows Juno Service. Please stand by...");
 
-            // Beign winJuno Activities
+            // Begin winJuno Activities
 
+            DateTime sunriseToday, sunsetToday;
             
+                
+            Common.Utilities.SunTimes.GetSunTimes(out sunriseToday, out sunsetToday);
 
             // start actions and hold on to their tasks for cancellation on stop.
             foreach (var device in _junoDevices)
