@@ -1,12 +1,12 @@
-﻿using System.Threading;
-using System.Speech.Synthesis;
-using System.Reflection;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Speech.Synthesis;
+using System.Threading;
 using System.Threading.Tasks;
-using System;
 
 
-namespace CTS.winJuno
+namespace CTS.WinJuno
 {
     public class WinJunoService : IDisposable
     {
@@ -15,64 +15,43 @@ namespace CTS.winJuno
 
         private readonly SpeechSynthesizer speechSynthesizer;
 
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly List<Task> _tasks = new List<Task>();
 
-        private readonly List<IJunoDevice> _junoDevices;
 
+
+        private readonly OberonEngine oberonEngine;
 
         public WinJunoService()
         {
             speechSynthesizer = new SpeechSynthesizer();
             speechSynthesizer.SetOutputToDefaultAudioDevice();
 
-            _junoDevices = new List<IJunoDevice>
-            {
-                CharonDevice.Instance()
-            };
+            oberonEngine = new OberonEngine();
         }
 
 
         public void Start()
         {
 
-            if (_disposed) throw new ObjectDisposedException(nameof(_cts));
+            if (_disposed) throw new ObjectDisposedException(nameof(cts));
 
 
-            _logger.Debug("Starting Windows Juno Service. Please stand by...");
+            _logger.Info("Starting Juno Service. Please stand by...");
 
             speechSynthesizer.Speak("Starting Windows Juno Service. Please stand by...");
 
-            // Begin winJuno Activities
-
-            DateTime sunriseToday, sunsetToday;
-            
-                
-            Common.Utilities.SunTimes.GetSunTimes(out sunriseToday, out sunsetToday);
-
-            // start actions and hold on to their tasks for cancellation on stop.
-            foreach (var device in _junoDevices)
-            {
-                //_logger.Debug($"Starting task for {activity.GetType().Name}");
-                // Pass the cancellation token to both the action (whether its used or not) as well as the StartNew()
-                // the former to support cancellation if the action supports it, the latter to support cancellation
-                // before the task starts up
-                //var task = Task.Factory.StartNew(() => device.Run(_cts.Token), _cts.Token);
-                //_tasks.Add(task);
-
-                 Task.Run(() => device.Run(_cts.Token));
-                // stagger starting, so that log messages don't overlap and to minimize concurrency and thread use.
-
-                _logger.Debug("Started Charon device...");
-                Thread.Sleep(100);
-            }
+            var task = Task.Factory.StartNew(() => oberonEngine.Run(cts.Token));
 
             _logger.Info("Service Started successfully!");
         }
 
         public void Stop()
         {
+            if (_disposed) throw new ObjectDisposedException(nameof(cts));
+
             _logger.Info("Juno Service Stop requested!");
+            speechSynthesizer.Speak("Stoping Juno Service. Please stand by...");
 
             int n = 3;
             while (n > 0)
@@ -84,10 +63,6 @@ namespace CTS.winJuno
 
         }
 
-        private void LaunchCharon()
-        {
-
-        }
 
         #region IDisposable Members
 
@@ -109,7 +84,7 @@ namespace CTS.winJuno
 
             if (disposing)
             {
-                _cts?.Dispose();
+                cts?.Dispose();
             }
 
             _disposed = true;

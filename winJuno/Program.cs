@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Topshelf;
 
-namespace CTS.winJuno
+namespace CTS.WinJuno
 {
     class Program
     {
