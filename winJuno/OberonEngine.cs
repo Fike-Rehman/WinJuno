@@ -21,6 +21,8 @@ namespace CTS.WinJuno
         private DateTime _sunriseToday;
         private DateTime _sunsetToday;
 
+        private Timer _pingTimer;
+
         public OberonEngine()
         {
             _oberonDevices = new List<OberonDevice>();
@@ -36,29 +38,54 @@ namespace CTS.WinJuno
             // See how many Oberon deivces we have in the system:
             LoadDevices();
 
-            // start a Ping task for each of the devices found:
             if (_oberonDevices.Count > 0)
             {
                 _oberonDevices.ForEach(device =>
                 {
-                    // start up a ping task:
+                    // Initialize the device by sending a Ping
                     Task<string> pingTask = PingAsync(device.IpAddress);
+
+                    if (pingTask.Result != "Success")
+                    {
+                        _logger.Warn($"PING FAILED: A device with IP Address:{device.IpAddress} doesn't appear to be online!");
+                        _logger.Warn("Removing the device from the device list");
+
+                        _oberonDevices.Remove(device);
+                    }
+                    else
+                    {
+                        // Device initialization succeeded. We can continue with more operations:
+                        // set up a timer that sends a ping asynchronously every minute:
+                        var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute  
+                        _pingTimer = new Timer(OnPingTimer, device, pingInterval, Timeout.InfiniteTimeSpan);
+
+                    }
                 });
             }
-
-
+            else
+            {
+                _logger.Warn("No devices found in the system!");
+            }
         }
 
 
         private void LoadDevices()
         {
-            using (StreamReader file = File.OpenText("OberonDevices.json"))
+            try
             {
-                // var serializer = new JsonSerializer();
-                string jsonString = file.ReadToEnd();
-                _oberonDevices = JsonConvert.DeserializeObject<List<OberonDevice>>(jsonString);
+                using (StreamReader file = File.OpenText("OberonDevices.json"))
+                {
+                    // var serializer = new JsonSerializer();
+                    string jsonString = file.ReadToEnd();
+                    _oberonDevices = JsonConvert.DeserializeObject<List<OberonDevice>>(jsonString);
 
-                _logger.Info($"Found {_oberonDevices.Count} Oberon devices defined in the system!");
+                    _logger.Info($"Found {_oberonDevices.Count} Oberon devices defined in the system!");
+                }
+            }
+            catch (Exception x)
+            {
+
+                _logger.Error($"Error while reading Oberon Devices file: {x.Message}");
             }
         }
 
@@ -93,5 +120,21 @@ namespace CTS.WinJuno
                 return pingResponse;
             }
         }
+
+        private async void OnPingTimer(object device)
+        {
+            // send a ping asynchronously and reset the timer
+            if (device is OberonDevice d)
+            {
+                var response = await PingAsync(d.IpAddress);
+
+                if (response == "Success")
+                {
+                    var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute
+                    _pingTimer.Change(pingInterval, Timeout.InfiniteTimeSpan);
+                }
+            }
+        }
+
     }
 }
