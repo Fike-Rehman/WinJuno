@@ -58,7 +58,9 @@
   <ItemGroup>
     <Compile Include="CharonDevice.cs" />
     <Compile Include="ConfigSettings.cs" />
+    <Compile Include="DeviceOps.cs" />
     <Compile Include="ICharonSettings.cs" />
+    <Compile Include="IDeviceOps.cs" />
     <Compile Include="IJunoDevice.cs" />
     <Compile Include="OberonDevice.cs" />
     <Compile Include="OberonEngine.cs" />
