@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CTS.WinJuno
 {
@@ -64,8 +65,9 @@ namespace CTS.WinJuno
             //    _logger.Warn("No devices found in the system!");
             //}
 
-            RunDevicesAsync();
+            var t = Task.Run(() => InitDevicesAsync());
 
+            t.Wait(cToken);
 
         }
 
@@ -90,13 +92,15 @@ namespace CTS.WinJuno
             }
         }
 
-        private async void RunDevicesAsync()
+        private async void InitDevicesAsync()
         {
             if (_oberonDevices.Count > 0)
             {
                 foreach (var device in _oberonDevices)
                 {
                     var ops = new DeviceOps();
+
+
 
                     var result = await ops.DevicePingAsync(device.IpAddress);
 
@@ -110,18 +114,18 @@ namespace CTS.WinJuno
                 }
             }
 
-            // start continous Ping routines:
+            //// start continous Ping routines:
 
-            if (_oberonDevices.Count > 0)
-            {
-                foreach (var device in _oberonDevices)
-                {
-                    var ops = new DeviceOps();
+            //if (_oberonDevices.Count > 0)
+            //{
+            //    foreach (var device in _oberonDevices)
+            //    {
+            //        var ops = new DeviceOps();
 
-                    ops.StartPingRoutine(device);
+            //        ops.StartPingRoutine(device);
 
-                }
-            }
+            //    }
+            //}
 
         }
 
