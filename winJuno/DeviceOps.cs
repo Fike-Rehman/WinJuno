@@ -61,14 +61,14 @@ namespace CTS.WinJuno
 
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri($"http://{deviceIp}/");
+                client.BaseAddress = new Uri($"http://{deviceIp}");
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
                 client.Timeout = TimeSpan.FromMilliseconds(10000);
 
                 try
                 {
-                    var response = await client.GetAsync("Ping");
+                    var response = await client.GetAsync("/ping");
 
 
                     if (response.IsSuccessStatusCode)

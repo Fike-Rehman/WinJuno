@@ -36,6 +36,8 @@ namespace CTS.WinJuno
             // See how many Oberon deivces we have in the system:
             LoadDevices();
 
+
+
             //if (_oberonDevices.Count > 0)
             //{
             //    _oberonDevices.ForEach(device =>
@@ -69,6 +71,11 @@ namespace CTS.WinJuno
 
             t.Wait(cToken);
 
+            if(t.IsCompleted)
+            {
+                _logger.Info("Finished device initializaiton!");
+            }
+
         }
 
 
@@ -96,11 +103,13 @@ namespace CTS.WinJuno
         {
             if (_oberonDevices.Count > 0)
             {
-                foreach (var device in _oberonDevices)
+
+                for(int i = _oberonDevices.Count -1; i >= 0; i-- )
                 {
+                    var device = _oberonDevices[i];
                     var ops = new DeviceOps();
 
-
+                    _logger.Debug($"Pinging device {device.IpAddress}");
 
                     var result = await ops.DevicePingAsync(device.IpAddress);
 
@@ -111,7 +120,28 @@ namespace CTS.WinJuno
                         _oberonDevices.Remove(device);
 
                     }
+                    else
+                    {
+                        _logger.Debug($"Device Initialized Successfully! Ip Address:{device.IpAddress}");
+                    }
+
                 }
+                //foreach (var device in _oberonDevices)
+                //{
+                //    var ops = new DeviceOps();
+
+
+
+                //    var result = await ops.DevicePingAsync(device.IpAddress);
+
+                //    if (!result)
+                //    {
+                //        _logger.Warn($"Removing device with IP Address:{device.IpAddress} from device list because it doesn't appear to be online");
+
+                //        _oberonDevices.Remove(device);
+
+                //    }
+                //}
             }
 
             //// start continous Ping routines:
