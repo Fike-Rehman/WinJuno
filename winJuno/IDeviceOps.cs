@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace CTS.WinJuno
 {
     public interface IDeviceOps
     {
-        Task<bool> DevicePingAsync(string deviceIp);
+        Task<PingResult> DevicePingAsync(string deviceIp, CancellationToken ct);
 
-        void StartPingRoutine(OberonDevice device);
+        void StartPingRoutine();
     }
 }

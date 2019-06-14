@@ -19,7 +19,7 @@ namespace CTS.WinJuno
         private DateTime _sunriseToday;
         private DateTime _sunsetToday;
 
-        private Timer _pingTimer;
+        
 
         public OberonEngine()
         {
@@ -36,46 +36,23 @@ namespace CTS.WinJuno
             // See how many Oberon deivces we have in the system:
             LoadDevices();
 
+            // Initialize the devices found:
+            InitDevicesAsync(cToken);
 
+            // Start the Task to run the Ping routines for each device:
 
-            //if (_oberonDevices.Count > 0)
-            //{
-            //    _oberonDevices.ForEach(device =>
-            //    {
-            //        // Initialize the device by sending a Ping
-            //        Task<bool> pingTask = DevicePingAsync(device.IpAddress);
+            _logger.Debug("Device initailization Completed!");
+            _logger.Debug($"{_oberonDevices.Count} active Oberon devices(s) detected during initialization!");
 
-            //        if (!pingTask.Result)
-            //        {
-            //            _logger.Warn($"Removing device with IP Address:{device.IpAddress} from device list because it doesn't appear to be online");
+            var pingTasks = new List<Task>();
 
-
-            //            _oberonDevices.Remove(device);
-            //        }
-            //        //else
-            //        //{
-            //        //    // Device initialization succeeded. We can continue with more operations:
-            //        //    // set up a timer that sends a ping asynchronously every minute:
-            //        //    var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute  
-            //        //    _pingTimer = new Timer(OnPingTimer, device, pingInterval, Timeout.InfiniteTimeSpan);
-            //        //}   
-
-            //    });
-            //}
-            //else
-            //{
-            //    _logger.Warn("No devices found in the system!");
-            //}
-
-            var t = Task.Run(() => InitDevicesAsync());
-
-            t.Wait(cToken);
-
-            if(t.IsCompleted)
+            _oberonDevices.ForEach(d =>
             {
-                _logger.Info("Finished device initializaiton!");
-            }
+                var pt = Task.Run(() => d.StartPingRoutine(), cToken);
+                pingTasks.Add(pt);
 
+                if (cToken.IsCancellationRequested) return;
+            });
         }
 
 
@@ -99,160 +76,36 @@ namespace CTS.WinJuno
             }
         }
 
-        private async void InitDevicesAsync()
+        private async void InitDevicesAsync(CancellationToken ct)
         {
             if (_oberonDevices.Count > 0)
             {
-
-                for(int i = _oberonDevices.Count -1; i >= 0; i-- )
+                for (int i = _oberonDevices.Count - 1; i >= 0; i--)
                 {
+                    if (ct.IsCancellationRequested) break;
+
                     var device = _oberonDevices[i];
-                    var ops = new DeviceOps();
+                    
+                    _logger.Debug($"Pinging device {device.IpAddress}....");
 
-                    _logger.Debug($"Pinging device {device.IpAddress}");
+                    var result = await device.DevicePingAsync(device.IpAddress, ct);
 
-                    var result = await ops.DevicePingAsync(device.IpAddress);
-
-                    if (!result)
+                    if (result == PingResult.FAILURE)
                     {
                         _logger.Warn($"Removing device with IP Address:{device.IpAddress} from device list because it doesn't appear to be online");
 
                         _oberonDevices.Remove(device);
-
+                    }
+                    else if(result == PingResult.CANCELLED)
+                    {
+                        _logger.Debug("Device initialization cancelled upon user request!");
                     }
                     else
                     {
                         _logger.Debug($"Device Initialized Successfully! Ip Address:{device.IpAddress}");
                     }
-
                 }
-                //foreach (var device in _oberonDevices)
-                //{
-                //    var ops = new DeviceOps();
-
-
-
-                //    var result = await ops.DevicePingAsync(device.IpAddress);
-
-                //    if (!result)
-                //    {
-                //        _logger.Warn($"Removing device with IP Address:{device.IpAddress} from device list because it doesn't appear to be online");
-
-                //        _oberonDevices.Remove(device);
-
-                //    }
-                //}
             }
-
-            //// start continous Ping routines:
-
-            //if (_oberonDevices.Count > 0)
-            //{
-            //    foreach (var device in _oberonDevices)
-            //    {
-            //        var ops = new DeviceOps();
-
-            //        ops.StartPingRoutine(device);
-
-            //    }
-            //}
-
         }
-
-        ///// <summary>
-        ///// Executes a Device Ping Asynchronously. Tries a number of times based on the 
-        ///// 'NumTries setting' before giving up. 
-        ///// </summary>
-        ///// <param name="deviceIp">Ip address of the target device</param>
-        ///// <returns></returns>
-        //private async Task<bool> DevicePingAsync(string deviceIp)
-        //{
-        //    var bSuccess = false;
-
-        //    var n = 0;
-
-        //    while (n < 3)
-        //    {
-        //        n++;
-
-        //        var pingresponse = await PingAsync(deviceIp);
-
-        //        if (pingresponse == "Success")
-        //        {
-        //            bSuccess = true;
-        //            break;
-        //        }
-
-
-        //        if (n == 3)
-        //        {
-        //            // already attempted 3 times and it failed every time.
-        //            bSuccess = false;
-        //            _logger.Error($"Device with Ip Address: {deviceIp} has failed to respond to repeated Ping requests");
-        //            _logger.Error("Please check this device and make sure that it is still Online");
-        //        }
-        //        else
-        //        {
-        //            await Task.Delay(3000); // give it a 3 sec delay before trying again
-        //        }
-        //    }
-
-        //    return bSuccess;
-        //}
-
-        //private async Task<string> PingAsync(string deviceIp)
-        //{
-        //    var pingResponse = "";
-
-        //    using (var client = new HttpClient())
-        //    {
-        //        client.BaseAddress = new Uri($"http://{deviceIp}/");
-        //        client.DefaultRequestHeaders.Accept.Clear();
-        //        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
-        //        client.Timeout = TimeSpan.FromMilliseconds(10000);
-
-        //        try
-        //        {
-        //            var response = await client.GetAsync("Ping");
-
-
-        //            if (response.IsSuccessStatusCode)
-        //            {
-        //                pingResponse = "Success";
-        //            }
-
-        //        }
-        //        catch (Exception x)
-        //        {
-        //            // the request takes longer than 10 secs, it is timed out
-        //            pingResponse = x.Message;
-        //        }
-
-        //        return pingResponse;
-        //    }
-        //}
-
-        //private async void OnPingTimer(object device)
-        //{
-        //    // send a ping asynchronously and reset the timer
-        //    if (device is OberonDevice d)
-        //    {
-        //        if (await DevicePingAsync(d.IpAddress))
-        //        {
-        //            var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute
-        //            _pingTimer.Change(pingInterval, Timeout.InfiniteTimeSpan);
-        //        }
-        //        else
-        //        {
-        //            // Device has failed to respond to the Ping request
-        //            _logger.Warn($"Device with Ip Address {d.IpAddress} is not responding to the Pings!");
-        //            _logger.Warn($"Please make sure this device is still on line");
-
-        //        }
-        //    }
-        //}
-
-
-
     }
 }
