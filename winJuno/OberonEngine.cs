@@ -37,7 +37,7 @@ namespace CTS.WinJuno
             LoadDevices();
 
             // Initialize the devices found:
-            InitDevicesAsync(cToken);
+            InitDevicesAsync(cToken).Wait();
 
             // Start the Task to run the Ping routines for each device:
 
@@ -76,7 +76,7 @@ namespace CTS.WinJuno
             }
         }
 
-        private async void InitDevicesAsync(CancellationToken ct)
+        private async Task InitDevicesAsync(CancellationToken ct)
         {
             if (_oberonDevices.Count > 0)
             {
@@ -102,7 +102,7 @@ namespace CTS.WinJuno
                     }
                     else
                     {
-                        _logger.Debug($"Device Initialized Successfully! Ip Address:{device.IpAddress}");
+                        _logger.Debug($"Device Ping Successful! Ip Address:{device.IpAddress}");
                     }
                 }
             }
