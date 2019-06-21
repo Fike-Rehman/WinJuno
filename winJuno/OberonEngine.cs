@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CTS.WinJuno
 {
@@ -18,6 +19,8 @@ namespace CTS.WinJuno
 
         private DateTime _sunriseToday;
         private DateTime _sunsetToday;
+
+        private readonly Stopwatch _stopWatch = new Stopwatch();
 
         
 
@@ -37,12 +40,16 @@ namespace CTS.WinJuno
             LoadDevices();
 
             // Initialize the devices found:
+
+            _stopWatch.Start();
             InitDevicesAsync(cToken).Wait();
+            _stopWatch.Stop();
 
             // Start the Task to run the Ping routines for each device:
 
-            _logger.Debug("Device initailization Completed!");
-            _logger.Debug($"{_oberonDevices.Count} active Oberon devices(s) detected during initialization!");
+            _logger.Info("Device initailization Complete!");
+            _logger.Info($"Initializaition took: {_stopWatch.Elapsed.Seconds} seconds");
+            _logger.Info($"{_oberonDevices.Count} responsive Oberon devices(s) detected during initialization!");
 
             var pingTasks = new List<Task>();
 

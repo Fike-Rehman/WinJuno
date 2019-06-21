@@ -116,16 +116,17 @@ namespace CTS.WinJuno
 
         public void StartPingRoutine()
         {
+            _logger.Info($"Starting Ping routine. device Ip: {IpAddress}");
             var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute
             _pingTimer = new Timer(OnPingTimer, null, pingInterval, Timeout.InfiniteTimeSpan);
         }
 
 
 
-        private async void OnPingTimer(object device)
+        private async void OnPingTimer(object state)
         {
             // send a ping asynchronously and reset the timer
-
+            _logger.Debug($"Sending Ping request.... Device:{IpAddress}");
             var response = await PingAsync(IpAddress);
 
             if (response == "Success")
