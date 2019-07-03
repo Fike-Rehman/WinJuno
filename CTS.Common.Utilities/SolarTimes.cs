@@ -1,7 +1,7 @@
-﻿using System;
-using System.Net;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Net;
 
 namespace CTS.Common.Utilities
 {
@@ -11,7 +11,7 @@ namespace CTS.Common.Utilities
     /// and Sunset times for Minneapolis are returned by default. The class utilizes
     /// http://sunrise-sunset.org/api . 
     /// </summary>
-    public static class SunTimes
+    public static class SolarTimes
     {
         // By default we use Minneapolis coordinates
         public static double Latitude { get; set; } = 44.9799700;
@@ -26,7 +26,7 @@ namespace CTS.Common.Utilities
         /// </summary>
         /// <param name="sunriseTime"></param>
         /// <param name="sunsetTime"></param>
-        public static void GetSunTimes(out DateTime sunriseTime, out DateTime sunsetTime)
+        public static void GetSolarTimes(out DateTime sunriseTime, out DateTime sunsetTime)
         {
             sunriseTime = default(DateTime);
             sunsetTime = default(DateTime);
@@ -45,9 +45,9 @@ namespace CTS.Common.Utilities
 
                     if (string.CompareOrdinal(status, "OK") == 0)
                     {
-                        var sunrise = (DateTime) token.SelectToken("results").SelectToken("sunrise");
+                        var sunrise = (DateTime)token.SelectToken("results").SelectToken("sunrise");
 
-                        var sunset = (DateTime) token.SelectToken("results").SelectToken("sunset");
+                        var sunset = (DateTime)token.SelectToken("results").SelectToken("sunset");
 
                         // These times are in UTC. We must convert and return times in local time
                         // zones taking into consideration the daylight savings time.
@@ -88,7 +88,7 @@ namespace CTS.Common.Utilities
         /// </summary>
         /// <param name="sunriseTime"></param>
         /// <param name="sunsetTime"></param>
-        public static void GetSunTimesUTC(out DateTime sunriseTime, out DateTime sunsetTime)
+        public static void GetSolarTimesUTC(out DateTime sunriseTime, out DateTime sunsetTime)
         {
             sunriseTime = default(DateTime);
             sunsetTime = default(DateTime);

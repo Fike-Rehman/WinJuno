@@ -42,6 +42,13 @@ namespace CTS.WinJuno
         public TimeSpan OffTime { get; set; }
 
 
+        public void StartPingRoutine()
+        {
+            var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute
+            _pingTimer = new Timer(OnPingTimer, null, pingInterval, Timeout.InfiniteTimeSpan);
+        }
+
+
         public async Task<PingResult> DevicePingAsync(string deviceIp, CancellationToken ct)
         {
             var result = PingResult.OK;
@@ -54,7 +61,7 @@ namespace CTS.WinJuno
 
                 n++;
 
-                _logger.Debug($"Sending ping request to deivce:{IpAddress}; Attempt # {n}");
+                _logger.Debug($"Sending ping request to device:{IpAddress}; Attempt # {n}");
 
                 var pingresponse = await PingAsync(deviceIp);
 
@@ -71,7 +78,7 @@ namespace CTS.WinJuno
                     // already attempted 3 times and it failed every time.
                     result = PingResult.FAILURE;
                     _logger.Error($"Device with Ip Address: {deviceIp} has failed to respond to repeated Ping requests");
-                    _logger.Error("Please check this device and make sure that it is still Online");
+                    _logger.Error("Please check this device and make sure that it is still On line");
                 }
                 else
                 {
@@ -113,13 +120,6 @@ namespace CTS.WinJuno
                 return pingResponse;
             }
         }
-
-        public void StartPingRoutine()
-        {
-            var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute
-            _pingTimer = new Timer(OnPingTimer, null, pingInterval, Timeout.InfiniteTimeSpan);
-        }
-
 
 
         private async void OnPingTimer(object device)

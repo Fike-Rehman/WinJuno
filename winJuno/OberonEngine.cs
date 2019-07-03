@@ -19,7 +19,7 @@ namespace CTS.WinJuno
         private DateTime _sunriseToday;
         private DateTime _sunsetToday;
 
-        
+
 
         public OberonEngine()
         {
@@ -31,9 +31,9 @@ namespace CTS.WinJuno
             // Begin Oberon Activities
 
             // Get the sunrise/sunset times 
-            SunTimes.GetSunTimes(out _sunriseToday, out _sunsetToday);
+            SolarTimes.GetSolarTimes(out _sunriseToday, out _sunsetToday);
 
-            // See how many Oberon deivces we have in the system:
+            // See how many Oberon devices we have in the system:
             LoadDevices();
 
             // Initialize the devices found:
@@ -41,7 +41,7 @@ namespace CTS.WinJuno
 
             // Start the Task to run the Ping routines for each device:
 
-            _logger.Debug("Device initailization Completed!");
+            _logger.Debug("Device initialization Completed!");
             _logger.Debug($"{_oberonDevices.Count} active Oberon devices(s) detected during initialization!");
 
             var pingTasks = new List<Task>();
@@ -62,7 +62,7 @@ namespace CTS.WinJuno
             {
                 using (StreamReader file = File.OpenText("OberonDevices.json"))
                 {
-                    // var serializer = new JsonSerializer();
+                    // var serialize = new JsonSerializer();
                     string jsonString = file.ReadToEnd();
                     _oberonDevices = JsonConvert.DeserializeObject<List<OberonDevice>>(jsonString);
 
@@ -85,20 +85,20 @@ namespace CTS.WinJuno
                     if (ct.IsCancellationRequested) break;
 
                     var device = _oberonDevices[i];
-                    
+
                     _logger.Debug($"Pinging device {device.IpAddress}....");
 
                     var result = await device.DevicePingAsync(device.IpAddress, ct);
 
                     if (result == PingResult.FAILURE)
                     {
-                        _logger.Warn($"Removing device with IP Address:{device.IpAddress} from device list because it doesn't appear to be online");
+                        _logger.Warn($"Removing device with IP Address:{device.IpAddress} from device list because it doesn't appear to be on line");
 
                         _oberonDevices.Remove(device);
                     }
-                    else if(result == PingResult.CANCELLED)
+                    else if (result == PingResult.CANCELLED)
                     {
-                        _logger.Debug("Device initialization cancelled upon user request!");
+                        _logger.Debug("Device initialization canceled upon user request!");
                     }
                     else
                     {
