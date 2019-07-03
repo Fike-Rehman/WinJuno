@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "winJuno", "winJuno\winJuno.csproj", "{2C305E60-A4E5-4F36-A05C-9370172079C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CTS.Common.Utilities", "CTS.Common.Utilities\CTS.Common.Utilities.csproj", "{91203F92-C413-427D-8E71-2CC0173DE36C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTS.Common.Utilities", "CTS.Common.Utilities\CTS.Common.Utilities.csproj", "{91203F92-C413-427D-8E71-2CC0173DE36C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{63E78454-3536-40E3-BF05-5C8818018434}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
