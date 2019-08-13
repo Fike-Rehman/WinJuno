@@ -28,8 +28,8 @@ namespace CTS.Common.Utilities
         /// <param name="sunsetTime"></param>
         public static void GetSolarTimes(out DateTime sunriseTime, out DateTime sunsetTime)
         {
-            sunriseTime = default(DateTime);
-            sunsetTime = default(DateTime);
+            sunriseTime = default;
+            sunsetTime = default;
 
             using (var client = new WebClient())
             {
@@ -90,8 +90,8 @@ namespace CTS.Common.Utilities
         /// <param name="sunsetTime"></param>
         public static void GetSolarTimesUTC(out DateTime sunriseTime, out DateTime sunsetTime)
         {
-            sunriseTime = default(DateTime);
-            sunsetTime = default(DateTime);
+            sunriseTime = default;
+            sunsetTime = default;
 
             using (var client = new WebClient())
             {
