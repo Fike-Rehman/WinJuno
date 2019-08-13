@@ -130,6 +130,7 @@ namespace CTS.WinJuno
 
             if (response == "Success")
             {
+                _logger.Debug($"Ping Acknowleged! Device Ip: {IpAddress}");
                 var pingInterval = new TimeSpan(0, 0, 1, 0); // 1 minute
                 _pingTimer.Change(pingInterval, Timeout.InfiniteTimeSpan);
             }
